@@ -37,7 +37,7 @@ To run this project locally, follow these steps:
 
 ```bash
 git clone https://github.com/tzar-beep/SnowTrace
-cd your-repository-name
+cd SnowTrace
 ```
 
 ### 2. Install Dependencies

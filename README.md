@@ -6,8 +6,9 @@ SnowTrace is a full-stack web application designed to accelerate avalanche searc
 
 This proof-of-concept provides a mission control dashboard for placing rescue assets, simulating team movements, and running AI-powered probability analysis to help teams make faster, life-saving decisions.
 
-<!-- You can replace this with a GIF of your app in action! -->
-![SnowTrace Demo](https://placehold.co/800x450/172554/7c9c9b?text=SnowTrace+App+Demo)
+![SnowTrace](https://placehold.co/800x450/172554/90B4BE?text=SnowTrace)
+
+
 
 ---
 

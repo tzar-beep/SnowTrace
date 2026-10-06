@@ -2,6 +2,8 @@
 
 **AI-Guided Avalanche Rescue Routes in Seconds**
 
+🔗 **Live Demo:** [snow-trace.vercel.app](https://snow-trace.vercel.app)
+
 SnowTrace is a full-stack web application designed to accelerate avalanche search and rescue operations. It uses an AI agent to analyze mission-critical data—such as victim locations, weather conditions, and terrain—to generate and visualize optimal rescue routes on an interactive map.
 
 This proof-of-concept provides a mission control dashboard for placing rescue assets, simulating team movements, and running AI-powered probability analysis to help teams make faster, life-saving decisions.

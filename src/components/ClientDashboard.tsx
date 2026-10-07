@@ -81,12 +81,14 @@ const ClientDashboard: React.FC = () => {
     setTeams([]);
 
     try {
-      const result = await getRescueRoutesAction({
+      const response = await getRescueRoutesAction({
         baseLocation: `${baseLocation.lat},${baseLocation.lng}`,
         victimLocations: victimLocations.map(v => `${v.lat},${v.lng}`),
         weatherConditions: weather,
         rescueStrategy: rescueStrategy,
       });
+      if (response.error !== undefined) throw new Error(response.error);
+      const result = response.data;
 
       setRoutes(result.routes);
       
@@ -120,12 +122,14 @@ const ClientDashboard: React.FC = () => {
 
 
     try {
-       const result = await getVictimProbabilityAction({
+       const response = await getVictimProbabilityAction({
         weatherConditions: weather,
         timeElapsed: timeElapsed,
         avalancheZoneCoordinates: avalancheZone.map(p => `${p.lat},${p.lng}`).join(';'),
         victimCoordinates: victimLocations.map(v => `${v.lat},${v.lng}`).join(';'),
       });
+      if (response.error !== undefined) throw new Error(response.error);
+      const result = response.data;
 
       setAnalysisSummary(result.summary);
       toast({ title: 'Success', description: 'Victim probability analyzed.' });

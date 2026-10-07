@@ -1,25 +1,38 @@
-
 'use server';
 
 import { generateRescueRoutes, type GenerateRescueRoutesInput, type GenerateRescueRoutesOutput } from "@/ai/flows/generate-rescue-routes";
 import { predictVictimProbability, type PredictVictimProbabilityInput, type PredictVictimProbabilityOutput } from "@/ai/flows/predict-victim-probability";
 
-export async function getRescueRoutesAction(input: GenerateRescueRoutesInput): Promise<GenerateRescueRoutesOutput> {
+// Server actions return errors instead of throwing: Next.js hides thrown
+// error messages in production builds, which surfaced as a generic
+// "Server Components render" error on Vercel.
+export type ActionResult<T> = { data: T; error?: undefined } | { data?: undefined; error: string };
+
+function missingKeyError(): string | null {
+    if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY && !process.env.GOOGLE_GENAI_API_KEY) {
+        return "GEMINI_API_KEY is not set on the server. Add it to your environment variables and redeploy.";
+    }
+    return null;
+}
+
+export async function getRescueRoutesAction(input: GenerateRescueRoutesInput): Promise<ActionResult<GenerateRescueRoutesOutput>> {
+    const keyError = missingKeyError();
+    if (keyError) return { error: keyError };
     try {
-        const output = await generateRescueRoutes(input);
-        return output;
+        return { data: await generateRescueRoutes(input) };
     } catch (error) {
         console.error("Error in generateRescueRoutes:", error);
-        throw new Error("Failed to generate rescue routes. Please try again.");
+        return { error: `Failed to generate rescue routes: ${(error as Error).message ?? "unknown error"}` };
     }
 }
 
-export async function getVictimProbabilityAction(input: PredictVictimProbabilityInput): Promise<PredictVictimProbabilityOutput> {
+export async function getVictimProbabilityAction(input: PredictVictimProbabilityInput): Promise<ActionResult<PredictVictimProbabilityOutput>> {
+    const keyError = missingKeyError();
+    if (keyError) return { error: keyError };
     try {
-        const output = await predictVictimProbability(input);
-        return output;
+        return { data: await predictVictimProbability(input) };
     } catch (error) {
         console.error("Error in predictVictimProbability:", error);
-        throw new Error("Failed to analyze victim probability. Please try again.");
+        return { error: `Failed to analyze victim probability: ${(error as Error).message ?? "unknown error"}` };
     }
 }

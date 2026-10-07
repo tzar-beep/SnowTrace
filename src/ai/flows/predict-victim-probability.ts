@@ -9,7 +9,7 @@
  * - PredictVictimProbabilityOutput - The return type for the predictVictimProbability function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, generateWithFallback} from '@/ai/genkit';
 import {z} from 'genkit';
 import { GaxiosError } from 'gaxios';
 
@@ -59,7 +59,7 @@ const predictVictimProbabilityFlow = ai.defineFlow(
   },
   async input => {
      try {
-      const {output} = await prompt(input);
+      const {output} = await generateWithFallback(prompt, input);
       if (!output) {
         throw new Error("The AI model failed to return a valid response. Please try again.");
       }

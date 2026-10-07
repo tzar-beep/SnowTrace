@@ -9,7 +9,7 @@
  * - GenerateRescueRoutesOutput - The return type for the generateRescueRoutes function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, generateWithFallback} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateRescueRoutesInputSchema = z.object({
@@ -80,7 +80,7 @@ const generateRescueRoutesFlow = ai.defineFlow(
     outputSchema: GenerateRescueRoutesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await generateWithFallback(prompt, input);
     if (!output) {
       throw new Error("The AI model failed to return a valid response. Please try again.");
     }

@@ -8,7 +8,9 @@ import { Skeleton } from '../ui/skeleton';
 import { TEAM_COLORS } from '../ClientDashboard';
 import AnimatedTeam from './AnimatedTeam';
 
-const MAP_ID = "snowtrace_map_id";
+// DEMO_MAP_ID is Google's public map ID that works with any key; set
+// NEXT_PUBLIC_GOOGLE_MAP_ID to use a styled map from your own Cloud project.
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "DEMO_MAP_ID";
 
 const containerStyle = {
   width: '100%',

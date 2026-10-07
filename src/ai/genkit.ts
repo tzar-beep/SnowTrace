@@ -3,12 +3,26 @@ import {googleAI} from '@genkit-ai/googleai';
 
 // Tried in order; Gemini models frequently return 503 "high demand" or get
 // retired for new keys, so fall back rather than fail the whole request.
+// Lite models first: they answer in seconds, while full flash models
+// often take 30s+ or return 503 under load.
 const MODELS = [
-  'googleai/gemini-flash-latest',
-  'googleai/gemini-3.5-flash',
   'googleai/gemini-flash-lite-latest',
-  'googleai/gemini-2.5-flash-lite',
+  'googleai/gemini-3.5-flash-lite',
+  'googleai/gemini-3.5-flash',
+  'googleai/gemini-flash-latest',
 ];
+
+const ATTEMPT_TIMEOUT_MS = 30_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`timed out after ${ms / 1000}s`)), ms);
+    promise.then(
+      v => { clearTimeout(timer); resolve(v); },
+      e => { clearTimeout(timer); reject(e); },
+    );
+  });
+}
 
 export const ai = genkit({
   plugins: [googleAI()],
@@ -16,7 +30,7 @@ export const ai = genkit({
 });
 
 const isRetryable = (e: unknown) =>
-  /\b(503|429|404|500)\b|high demand|overloaded|no longer available|not found/i.test(String((e as Error)?.message ?? e));
+  /\b(503|429|404|500)\b|high demand|overloaded|timed out|no longer available|not found/i.test(String((e as Error)?.message ?? e));
 
 export async function generateWithFallback<I, R>(
   prompt: (input: I, opts?: {model?: string}) => Promise<R>,
@@ -26,7 +40,7 @@ export async function generateWithFallback<I, R>(
   for (const model of MODELS) {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        return await prompt(input, {model});
+        return await withTimeout(prompt(input, {model}), ATTEMPT_TIMEOUT_MS);
       } catch (e) {
         lastError = e;
         if (!isRetryable(e)) throw e;
